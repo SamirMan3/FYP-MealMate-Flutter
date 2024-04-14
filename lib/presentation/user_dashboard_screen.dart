@@ -1,16 +1,24 @@
+import 'package:mealmate/core/controller/authcontroller.dart';
+import 'package:mealmate/presentation/doctor_details_screen_Id.dart';
 import 'package:mealmate/presentation/user_prescription_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:mealmate/presentation/userprofile_item_widget_new.dart';
 import 'package:mealmate/presentation/userprofilesection_item_widget.dart';
+import 'package:provider/provider.dart';
 import 'userprofile_item_widget.dart';
 import 'package:mealmate/core/app_export.dart';
 import 'package:mealmate/widgets/app_bar/appbar_leading_image.dart';
 import 'user_drawer.dart';
 import 'package:mealmate/widgets/app_bar/custom_app_bar.dart';
+import 'package:http/http.dart' as http;
 import 'package:mealmate/main.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 String selectedDoctor = ''; // for booking screen
+String selectedDoctorId = ''; // for booking screen
 String docname = ''; // for pre-booked screen
 
 class UserDashboardScreen extends StatefulWidget {
@@ -21,7 +29,8 @@ class UserDashboardScreen extends StatefulWidget {
 }
 
 class _UserDashboardScreenState extends State<UserDashboardScreen> {
-  final _firestore = FirebaseFirestore.instance;
+  // final _firestore = FirebaseFirestore.instance;
+
   List doctors = [];
   String goal = '';
   Map<String, String> products = {};
@@ -29,41 +38,98 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    getName();
+    getProfile();
     getDoctors();
-    fetchData();
+    // fetchData();
   }
 
-  Future<void> fetchData() async {
-    await getProducts(); // Wait for getProducts to complete
-  }
+  // Future<void> fetchData() async {
+  //   await getProducts(); // Wait for getProducts to complete
+  // }
 
   //firebase
-  getName() async {
-    final userDoc = await _firestore
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .get();
-    for (var username in userDoc.docs) {
-      name = username.data()['username'];
-      docname = username.data()['doctor name'];
-      goal = username.data()['goal'];
-    }
-    setState(() {
-      _buildDietitiansProfile(context);
-      getProducts();
-      fetchData();
-    });
-  }
+  // getName() async {
+  //   final userDoc = await _firestore
+  //       .collection('users')
+  //       .where('email', isEqualTo: email)
+  //       .get();
+  //   for (var username in userDoc.docs) {
+  //     name = username.data()['username'];
+  //     docname = username.data()['doctor name'];
+  //     goal = username.data()['goal'];
+  //   }
+  //   setState(() {
+  //     _buildDietitiansProfile(context);
+  //     getProducts();
+  //     fetchData();
+  //   });
+  // }
 
   //firebase
   getDoctors() async {
-    await for (var snapshot
-        in _firestore.collection('doctor names').snapshots()) {
-      for (var doctor in snapshot.docs) {
-        var doc = doctor.data();
-        doctors = doc.values.toList();
+    final accessToken =
+        Provider.of<AuthProvider>(context, listen: false).accessToken;
+    try {
+      http.Response response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/api/dashboard'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      var responseData = json.decode(response.body);
+      doctors.clear();
+
+      // Iterate through responseData and extract doctor data
+      for (var doctorData in responseData['doctor_list']) {
+        doctors.add(doctorData);
       }
+      // doctors = responseData['doctor_list'];
+      // final newUser= data;
+    } catch (e) {
+      print('hello from the catch');
+      print(e);
+    }
+    setState(() {
+      _buildDietitiansProfile(context);
+    });
+  }
+
+  getProfile() async {
+    final accessToken =
+        Provider.of<AuthProvider>(context, listen: false).accessToken;
+    try {
+      http.Response response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/api/getProfile'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      print("from the userdashboard for get profile");
+      var responseData = json.decode(response.body);
+      name = responseData['user']?['first_name'];
+      if (response.statusCode == 201) {
+        String firstName = responseData['user']?['first_name'];
+        String lastName = responseData['user']?['last_name'];
+        String docFirstName = responseData['my_doctor']?['first_name'];
+        String docLastName = responseData['my_doctor']?['last_name'];
+
+// Concatenate first and last name
+        String fullName = '$firstName $lastName';
+        String docFullName = '$docFirstName $docLastName';
+
+        docname = docFirstName;
+        print(name);
+        // name = username.data()['username'];
+        // docname = username.data()['doctor name'];
+        // goal = username.data()['goal'];
+      }
+      // doctors = responseData['doctor_list'];
+      // final newUser= data;
+    } catch (e) {
+      print('hello from the catch');
+      print(e);
     }
     setState(() {
       _buildDietitiansProfile(context);
@@ -74,33 +140,34 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   List<String> names = [];
   List<String> descriptions = [];
   List<String> links = [];
-  Future<void> getProducts() async {
-    await for (var snapshot in _firestore.collection(goal).snapshots()) {
-      // Clear lists before populating them in each iteration
-      names.clear();
-      descriptions.clear();
-      links.clear();
-      for (var product in snapshot.docs) {
-        var prod = product.data();
-        // Extract values from the map and add them to the lists
-        names.add(prod['Name'] ?? '');
-        descriptions.add(prod['Description'] ?? '');
-        links.add(prod['Link'] ?? '');
-      }
-      print('Names: $names');
-      print('Descriptions: $descriptions');
-      print('Links: $links');
-    }
-    setState(() {
-      _buildFoodProfileSection(context);
-    });
-  }
+  // Future<void> getProducts() async {
+  //   await for (var snapshot in _firestore.collection(goal).snapshots()) {
+  //     // Clear lists before populating them in each iteration
+  //     names.clear();
+  //     descriptions.clear();
+  //     links.clear();
+  //     for (var product in snapshot.docs) {
+  //       var prod = product.data();
+  //       // Extract values from the map and add them to the lists
+  //       names.add(prod['Name'] ?? '');
+  //       descriptions.add(prod['Description'] ?? '');
+  //       links.add(prod['Link'] ?? '');
+  //     }
+  //     print('Names: $names');
+  //     print('Descriptions: $descriptions');
+  //     print('Links: $links');
+  //   }
+  //   setState(() {
+  //     _buildFoodProfileSection(context);
+  //   });
+  // }
 
   int currentPage = 0;
   final PageController _page = PageController();
 
   @override
   Widget build(BuildContext context) {
+    //  final accesstoken =Provider.of<AuthProvider>(context).accessToken;
     return SafeArea(
       child: Scaffold(
         appBar: _buildAppBar(context),
@@ -291,8 +358,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           ),
                         )),
                     _buildFoodProfileSection(context),
-                    ElevatedButton(
-                        onPressed: getProducts, child: Text('Click here'))
+                    // ElevatedButton(
+                    //     // onPressed: getProducts, child: Text('Click here')
+                    //     )
                   ],
                 ),
               ),
@@ -318,6 +386,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         itemBuilder: (context, index) {
           return UserprofilesectionItemWidget(
             index: index,
+            id: index.toString(),
             name: names[index], // Use the data from the lists
             description: descriptions[index],
             link: links[index],
@@ -337,13 +406,35 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           return SizedBox(height: 15.v);
         },
         itemCount: doctors.length,
+        // itemCount: doctors.length,
         itemBuilder: (context, index) {
-          return UserprofileItemWidget(
-            onTapUserProfile: (selectedDoctorName) {
+          // print(doctors[index]);
+          return UserprofileItemWidgetNew(
+            // return UserprofileItemWidget(
+            onTapUserProfile: (selectedDoctorName, selectedDoctorId) {
               selectedDoctor = selectedDoctorName!;
-              Navigator.pushNamed(context, AppRoutes.doctorDetailsScreen);
+              selectedDoctorId = selectedDoctorId!;
+              print('selected Doctor Id and name');
+              print(selectedDoctorId);
+              // print(selectedDoctor);
+              // Navigator.pushNamed(context,  AppRoutes.doctorDetailsScreenId.replaceAll(':id','3'));
+              // Navigator.pushNamed(context, AppRoutes.doctorDetailsScreenId,
+              //     arguments: {'doctorId': selectedDoctorId});
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      DoctorDetailsScreenId(doctorId: selectedDoctorId.toString()),
+                ),
+              );
+              //  arguments: '3'
+
+              // Navigator.pushNamed(context, AppRoutes.doctorDetailsScreen);
             },
-            doctorName: doctors[index],
+            // doctorName: 'Charissa',
+            doctorName: doctors[index]['first_name'],
+            doctorID: doctors[index]['id'],
           );
         },
       ),
