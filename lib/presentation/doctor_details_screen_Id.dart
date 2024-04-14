@@ -4,15 +4,21 @@ import 'package:http/http.dart' as http;
 import 'package:mealmate/core/app_export.dart';
 import 'package:mealmate/widgets/custom_elevated_button.dart';
 import 'user_dashboard_screen.dart'; // getting doctors profile selected selected
+import 'package:provider/provider.dart';
+import 'dart:convert';
+import 'package:mealmate/core/controller/authcontroller.dart';
 
-class DoctorDetailsScreen extends StatefulWidget {
-  const DoctorDetailsScreen({Key? key}) : super(key: key);
+class DoctorDetailsScreenId extends StatefulWidget {
+  final String? doctorId;
+
+  const DoctorDetailsScreenId({Key? key, this.doctorId}) : super(key: key);
+  // const DoctorDetailsScreenId({Key? key}) : super(key: key);
 
   @override
-  _DoctorDetailsScreenState createState() => _DoctorDetailsScreenState();
+  _DoctorDetailsScreenIdState createState() => _DoctorDetailsScreenIdState();
 }
 
-class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
+class _DoctorDetailsScreenIdState extends State<DoctorDetailsScreenId> {
   final _firestore = FirebaseFirestore.instance;
   String qualifications = '',
       regno = '',
@@ -26,48 +32,61 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     getDoctorDetails();
   }
 
-  void getDoctorDetails() async {
-    final docDetails = await _firestore.collection('doctors').where('doctor name',isEqualTo:selectedDoctor).get();
-    for(var details in docDetails.docs){
-      qualifications = details.data()['qualifications'];
-      regno = details.data()['regno'];
-      patients = details.data()['number of patients'];
-      experience = details.data()['experience'];
-      about = details.data()['about'];
-    }
-    setState(() {
-      _buildBody(context);
-    });
-  }
+
   // void getDoctorDetails() async {
-  //   try {
-  //     http.Response response = await http.get(
-  //       Uri.parse('http://10.0.2.2:8000/api/getDoctor/'),
-  //       headers: {
-  //         'Authorization': 'Bearer $accessToken',
-  //       },
-  //     );
-
-  //     print("from the userdashboard for the doctor list");
-  //     Map<String, dynamic> responseData = json.decode(response.body);
-
-  //     doctors.clear();
-
-  //     // Iterate through responseData and extract doctor data
-  //     for (var doctorData in responseData['doctor_list']) {
-  //       doctors.add(doctorData);
-  //     }
-  //     print(doctors);
-  //     // doctors = responseData['doctor_list'];
-  //     // final newUser= data;
-  //   } catch (e) {
-  //     print('hello from the catch');
-  //     print(e);
+  //   final docDetails = await _firestore
+  //       .collection('doctors')
+  //       .where('doctor name', isEqualTo: selectedDoctor)
+  //       .get();
+  //   for (var details in docDetails.docs) {
+  //     qualifications = details.data()['qualifications'];
+  //     regno = details.data()['regno'];
+  //     patients = details.data()['number of patients'];
+  //     experience = details.data()['experience'];
+  //     about = details.data()['about'];
   //   }
   //   setState(() {
   //     _buildBody(context);
   //   });
   // }
+
+  void getDoctorDetails() async {
+    final accessToken =
+        Provider.of<AuthProvider>(context, listen: false).accessToken;
+
+    print('getDotor functoion vitra xu');
+    // print(selectedDoctorId);
+    //  print(widget.doctorId);
+     var id = widget.doctorId;
+    try {
+      http.Response response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/api/getDoctor/' + id.toString()),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      print("from the userdashboard for the doctor list");
+      Map<String, dynamic> responseData = json.decode(response.body);
+      print(responseData['qualification']);
+      if (responseData['status'] == true) {
+        
+     
+
+          qualifications = responseData['qualification'].toString();
+          experience = responseData['experience'].toString();
+          about = responseData['about'].toString();
+     
+ }
+      // Iterate through responseData and extract doctor data
+    } catch (e) {
+      print('hello from the catch');
+      print(e);
+    }
+    setState(() {
+      _buildBody(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +99,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-  
+    print("insude the doctor dertail page");
+    print(selectedDoctor);
+
     return Container(
       width: double.maxFinite,
       padding: EdgeInsets.symmetric(horizontal: 9.h, vertical: 30.v),
@@ -97,7 +118,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             },
           ),
           SizedBox(height: 20.v),
-          Text("Doctor Details", style: theme.textTheme.displaySmall),
+          Text("Dietician Details", style: theme.textTheme.displaySmall),
           SizedBox(height: 30.v),
           CustomImageView(
             imagePath: ImageConstant.docimg,
@@ -134,7 +155,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: EdgeInsets.only(left: 9.h),
-              child: Text("About Doctor", style: theme.textTheme.titleLarge),
+              child: Text("About Dietician", style: theme.textTheme.titleLarge),
             ),
           ),
           SizedBox(height: 10.v),
@@ -151,6 +172,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   }
 
   Widget _buildRecentOrders(BuildContext context) {
+    print(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
