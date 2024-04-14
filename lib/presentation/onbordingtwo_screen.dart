@@ -175,10 +175,15 @@ class _OnbordingtwoScreenState extends State<OnbordingtwoScreen> {
 
   /// Navigates to the onbordingthreeScreen when the action is triggered.
   onTapNextButton(BuildContext context) {
+    print("Onboardingtwo##############");
+     Map<String, dynamic>? args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+
+    // Check if args is not null before accessing its properties
+    var selectedGoal = args?['selectedGoal'];
     Navigator.pushNamed(
       context,
       AppRoutes.onbordingthreeScreen,
-      arguments: {'selectedGender': selectedGender},
+      arguments: {'selectedGender': selectedGender, 'selectedGoal': selectedGoal},
     );
   }
 }

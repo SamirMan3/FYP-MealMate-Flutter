@@ -12,9 +12,10 @@ class OnbordingfourScreen extends StatefulWidget {
 
 class _OnbordingfourScreenState extends State<OnbordingfourScreen> {
 
-  List<String> feet = List.generate(8, (index) => (index + 1).toString());
+  List<String> feet = List.generate(8, (index) => (index).toString());
   List<String> inches = List.generate(12, (index) => index.toString());
-  List<String> weight = List.generate(121, (index) => (index+30).toString());
+  List<String> weight = List.generate(121, (index) => (index).toString());
+  
 
   @override
   Widget build(BuildContext context) {
@@ -268,10 +269,15 @@ class _OnbordingfourScreenState extends State<OnbordingfourScreen> {
 
   /// Navigates to the signupScreen when the action is triggered.
   onTapNEXT(BuildContext context) {
+    Map<String, dynamic>? args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+    // Check if args is not null before accessing its properties
+    var selectedGoal = args?['selectedGoal'];
+    var selectedGender = args?['selectedGender'];
+    var selectedDate = args?['dob'];
     Navigator.pushNamed(
       context,
       AppRoutes.signupScreen,
-      arguments: {'feet': selectedFeet, 'inch': selectedInch, 'weight': selectedWeight,},
+      arguments: {'feet': selectedFeet, 'inch': selectedInch, 'weight': selectedWeight,'dob': selectedDate,'selectedGender': selectedGender, 'selectedGoal': selectedGoal},
     );
   }
 }
