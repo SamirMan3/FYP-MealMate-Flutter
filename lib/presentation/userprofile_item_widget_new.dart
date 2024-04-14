@@ -1,28 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:mealmate/core/app_export.dart';
 
-class UserprofileItemWidget extends StatefulWidget {
+class UserprofileItemWidgetNew extends StatefulWidget {
   final String doctorName;
-  // final String doctorID;
-  final void Function(String?)? onTapUserProfile;
+  final int doctorID;
+  final void Function(String?, int?)? onTapUserProfile;
 
-  UserprofileItemWidget({
+  UserprofileItemWidgetNew({
     Key? key,
     required this.doctorName,
-    // required this.doctorID,
+    required this.doctorID,
     this.onTapUserProfile,
   }) : super(key: key);
 
   @override
-  _UserprofileItemWidgetState createState() => _UserprofileItemWidgetState();
+  _UserprofileItemWidgetNewState createState() => _UserprofileItemWidgetNewState();
 }
 
-class _UserprofileItemWidgetState extends State<UserprofileItemWidget> {
+class _UserprofileItemWidgetNewState extends State<UserprofileItemWidgetNew> {
   @override
   Widget build(BuildContext context) {
+    //doctor profile id
+    // print("doctor id");
+    // print(widget.doctorID);
+         Map<String, dynamic>? args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+
+    // Check if args is not null before accessing its properties
+    var selectedGoal = args?['id'];
     return GestureDetector(
       onTap: () {
-        widget.onTapUserProfile?.call(widget.doctorName);
+        print(widget.doctorID);
+        widget.onTapUserProfile?.call(widget.doctorName,widget.doctorID);
       },
       child: Container(
         padding: EdgeInsets.all(7.h),

@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 class UserprofilesectionItemWidget extends StatefulWidget {
   final int index;
+  final String id;
   final String name;
   final String description;
   final String link;
@@ -11,6 +12,7 @@ class UserprofilesectionItemWidget extends StatefulWidget {
   const UserprofilesectionItemWidget({
     Key? key,
     required this.index,
+    required this.id,
     required this.name,
     required this.description,
     required this.link,
