@@ -1,16 +1,18 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mealmate/core/app_export.dart';
 import 'package:mealmate/core/utils/config.dart';
 import 'package:mealmate/main.dart';
+import 'package:provider/provider.dart';
 import 'package:mealmate/widgets/custom_elevated_button.dart';
+import 'package:mealmate/core/controller/authcontroller.dart'; // Import Provider
 
-class UserSigninScreen extends StatefulWidget {
+class UserSigninScreen extends StatefulWidget { 
   const UserSigninScreen({Key? key}) : super(key: key);
 
   @override
@@ -20,7 +22,7 @@ class UserSigninScreen extends StatefulWidget {
 class _UserSigninScreenState extends State<UserSigninScreen> {
   String password = '', loggedinEmail = '';
   bool obsecurePass = true, notReg = false;
-  final _auth = FirebaseAuth.instance;
+  // final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
 
   TextEditingController _emailController = TextEditingController();
@@ -139,8 +141,12 @@ class _UserSigninScreenState extends State<UserSigninScreen> {
                 CustomElevatedButton(
                   text: "Sign In",
                   buttonTextStyle: CustomTextStyles.headlineSmallBlack90004,
-                  onPressed: () {
-                    loginApi();
+                  onPressed: () async {
+                    // onTapSignUp(context);
+                    loginApi(
+                      _emailController.text.toString(),
+                      _passwordController.text.toString(),
+                    );
                   },
                 ),
                 SizedBox(height: 10),
@@ -166,80 +172,73 @@ class _UserSigninScreenState extends State<UserSigninScreen> {
     Navigator.pop(context);
   }
 
-  /// Navigates to the userDashboardScreen when the action is triggered.
-  Future<void> onTapSignIn(BuildContext context) async {
+  void loginApi(String email, String password) async {
     // try {
-    // Make a POST request to your API endpoint
-    final response = await http.post(
-      Uri.parse('http://192.168.1.3:8000/api/user/login'),
-      body: {
-        'email': "test1@test.com",
-        'password': "1234",
-        // 'email': email,
-        // 'password': password,
-      },
-    );
-    print(response.request);
+    // final response = await http.post(
+    //   Uri.parse('http://10.0.2.2:8000/api/user/login'),
+    //   body: {'email': "test@test.com", 'password': "1234"},
+    // );
 
-    // Check if the request was successful (status code 200)
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      // Parse the response
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      if (responseData['status']) {
-        // Authentication successful, navigate to user dashboard
-        Navigator.pushNamed(context, AppRoutes.userDashboardScreen);
-      } else {
-        // Authentication failed, set notReg state to true
-        setState(() {
-          notReg = true;
-        });
-      }
-    } else {
-      // Handle non-200 status code (e.g., server error)
-      print(
-          'Request failed with status: here ${response.statusCode} ${response.body}');
-    }
-    // } catch (e) {
-    //   // Handle exceptions
-    //   print('Error: eta $e');
-    //   setState(() {
-    //     passwordError = true; // Set password error to true on authentication failure
-    //   });
-    // }
-    // try {
-    //   final newUser = await _auth.signInWithEmailAndPassword(email: email, password: password);
-    //   if (newUser != null) {
-    //     if (loggedinEmail == email){
-    //       Navigator.pushNamed(context, AppRoutes.userDashboardScreen);
-    //     }else{
-    //       setState(() {
-    //         notReg = true;
-    //       });
-    //     }
-    //   }
-    // } catch (e) {
-    //   print(e);
-    //   setState(() {
-    //     passwordError = true; // Set password error to true on authentication failure
-    //   });
-    // }
-  }
+    // Response response =
+    //     await post(Uri.parse('http://10.0.2.2:8000/api/user/login'), body: {
+    //   'password': password,
+    //   'email': email,
+    // });
 
-  void loginApi() async {
+    // if (response.statusCode == 200) {
+    //   print("success");
+    //   print(data);
+    //   Get.snackbar('Login Successfull', 'Congratulations');
+    // } else {
+    //   print(data);
+    //   Get.snackbar('Login failed', data['error']);
+    // }
     try {
-      final response = await http.post(
-          Uri.parse('http://192.168.1.3:8000/api/user/login'),
-          body: {'email': "test1@test.com", 'password': "1234"});
+      http.Response response = await http
+          .post(Uri.parse('http://10.0.2.2:8000/api/user/login'), body: {
+        'password': password,
+        'email': email,
+      });
 
-      var data = jsonDecode(response.body);
+      // Parse the JSON response
+      Map<String, dynamic> responseData = json.decode(response.body);
 
-      if (response.statusCode == 200) {
-        Get.snackbar('Login Successfull', 'Congratulations');
+      // Check if the status is true
+      if (responseData['status'] == true) {
+        // Access the token from the nested structure
+        String token = responseData['token'];
+
+        print(responseData);
+
+        // Now you can use the token
+         Provider.of<AuthProvider>(context, listen: false).accessToken = token;
+        // .setAccessToken
+           Navigator.pushNamed(context, AppRoutes.userDashboardScreen);
       } else {
-        Get.snackbar('Login failed', data['error']);
+        // Handle unsuccessful login
+        String errorMessage = responseData['message'];
+        print('Error: $errorMessage');
       }
+
+      // if (response.statusCode == 201) {
+      //   print("from the login function");
+
+      //   print(response.body);
+      //   // final newUser= data;
+      //   String accessToken = response.body.token;
+
+      //   // Set access token in the context
+      //   Provider.of<AuthProvider>(context, listen: false).accessToken =
+      //       accessToken;
+
+      //   Navigator.pushNamed(context, AppRoutes.userDashboardScreen);
+      //   // print(data);
+      //   // Get.snackbar('Login Successfull', 'Congratulations');
+      // } else {
+      //   print('failed from login');
+      // }
     } catch (e) {
-      Get.snackbar("Exception", e.toString());
+      print(e.toString());
     }
   }
 }
