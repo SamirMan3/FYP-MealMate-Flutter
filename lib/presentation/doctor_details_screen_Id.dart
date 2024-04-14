@@ -68,14 +68,15 @@ class _DoctorDetailsScreenIdState extends State<DoctorDetailsScreenId> {
 
       print("from the userdashboard for the doctor list");
       Map<String, dynamic> responseData = json.decode(response.body);
-      print(responseData['qualification']);
+      print(responseData['doctor']['count']);
       if (responseData['status'] == true) {
         
      
 
-          qualifications = responseData['qualification'].toString();
-          experience = responseData['experience'].toString();
-          about = responseData['about'].toString();
+          patients = responseData['doctor']['count'].toString();
+          qualifications = responseData['doctor']['qualification'].toString();
+          experience = responseData['doctor']['experience'].toString();
+          about = responseData['doctor']['about'].toString();
      
  }
       // Iterate through responseData and extract doctor data
@@ -225,6 +226,7 @@ class _DoctorDetailsScreenIdState extends State<DoctorDetailsScreenId> {
                 ratingText,
                 style: CustomTextStyles.titleLargeSansSerifCollection
                     .copyWith(color: appTheme.black90003),
+                    
               ),
             ),
             Align(
@@ -245,7 +247,10 @@ class _DoctorDetailsScreenIdState extends State<DoctorDetailsScreenId> {
   }
 
   onTapBookNow(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.userDietDetailsScreen);
+    var doctorId = widget.doctorId;
+    Navigator.pushNamed(context, AppRoutes.userDietDetailsScreen, arguments: {
+        'doctorId': doctorId,
+      },);
   }
 
   /// Navigates back to the previous screen.

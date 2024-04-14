@@ -5,6 +5,13 @@ import 'package:mealmate/main.dart';
 import 'package:mealmate/presentation/user_dashboard_screen.dart';
 import 'package:mealmate/widgets/custom_elevated_button.dart';
 import 'package:mealmate/widgets/custom_text_form_field.dart';
+import 'dart:convert';
+import 'package:mealmate/core/controller/authcontroller.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+
+
+
 
 class UserDietDetailsScreen extends StatefulWidget {
   const UserDietDetailsScreen({Key? key}) : super(key: key);
@@ -73,7 +80,30 @@ class _UserDietDetailsScreenState extends State<UserDietDetailsScreen> {
     }
   }
 
+void   generateDietPlan(history, allergens, doctorId)async{
+ print('inside generate the plan');
+   print('Medical History: $history');
+    print('Allergens: $allergens');
+    print('Allergens: $doctorId');
+      final accessToken =
+        Provider.of<AuthProvider>(context, listen: false).accessToken;
+       try {
+      http.Response response = await http
+          .post(Uri.parse('http://10.0.2.2:8000/api/doctor/requestDiet'), headers: {
+          'Authorization': 'Bearer $accessToken',
+        }, body: {
+        'medical_history': history,
+        'allergens': allergens,
+        'doctor_id': doctorId,
+      });
 
+      // Parse the JSON response
+      Map<String, dynamic> responseData = json.decode(response.body);
+      print(responseData);
+        } catch (e) {
+      print(e.toString());
+    }
+}
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -125,6 +155,9 @@ class _UserDietDetailsScreenState extends State<UserDietDetailsScreen> {
   }
 
   Widget _buildGenerateDietplan(BuildContext context) {
+      final Map<String, dynamic>? args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+  final String doctorId = args?['doctorId'] ?? ''; // Use default value if doctorId is not provided
+
     return CustomElevatedButton(
       height: 51.v,
       text: "Generate Diet plan",
@@ -134,8 +167,10 @@ class _UserDietDetailsScreenState extends State<UserDietDetailsScreen> {
       onPressed: () {
         updateUserDetails();
         updateDoctorDetails();
+        generateDietPlan(history, allergens, doctorId);
         Navigator.pushNamed(context, AppRoutes.successfullyBookedScreen);
       },
     );
   }
 }
+

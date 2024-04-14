@@ -108,6 +108,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
       print("from the userdashboard for get profile");
       var responseData = json.decode(response.body);
+      print(responseData);
       name = responseData['user']?['first_name'];
       if (response.statusCode == 201) {
         String firstName = responseData['user']?['first_name'];

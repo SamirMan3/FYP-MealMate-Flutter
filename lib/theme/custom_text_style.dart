@@ -11,6 +11,7 @@ class CustomTextStyles {
 
   static get headlineLargeRegular => theme.textTheme.headlineLarge!.copyWith(
         fontWeight: FontWeight.w400,
+        // fontSize: 10,
       );
   static get headlineSmallBlack900 => theme.textTheme.headlineSmall!.copyWith(
         color: appTheme.black900,
