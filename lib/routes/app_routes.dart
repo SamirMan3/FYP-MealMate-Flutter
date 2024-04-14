@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mealmate/presentation/doctor_details_screen_Id.dart';
 import 'package:mealmate/presentation/home_screen.dart';
 import 'package:mealmate/presentation/patient_details_screen.dart';
 import 'package:mealmate/presentation/user_signin_screen.dart';
@@ -25,7 +26,8 @@ class AppRoutes {
 
   static const String onbordingoneScreen = '/onbordingone_screen';
 
-  static const String doctorDetailsScreen = '/doctor_details_screen';
+  static const String doctorDetailsScreen = '/doctor_details_screen/';
+  static const String doctorDetailsScreenId = '/doctor_details_screen/:id';
 
   static const String successfullyBookedScreen = '/successfully_booked_screen';
 
@@ -54,6 +56,7 @@ class AppRoutes {
     userSigninScreen: (context) => UserSigninScreen(),
     onbordingoneScreen: (context) => OnbordingoneScreen(),
     doctorDetailsScreen: (context) => DoctorDetailsScreen(),
+    doctorDetailsScreenId: (context) => DoctorDetailsScreenId(),
     doctorSignupScreen: (context) => DocSignupScreen(),
     successfullyBookedScreen: (context) => SuccessfullyBookedScreen(),
     onbordingthreeScreen: (context) => OnbordingthreeScreen(),

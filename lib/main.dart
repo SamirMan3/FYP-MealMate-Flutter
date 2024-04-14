@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mealmate/core/controller/authcontroller.dart';
 import 'package:mealmate/presentation/home_screen.dart';
+import 'package:provider/provider.dart';
 import 'core/app_export.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -28,21 +30,47 @@ void main() async{
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // return Sizer(
+    //   builder: (context, orientation, deviceType) {
+    //     return MaterialApp(
+    //       theme: theme,
+    //       title: 'mealmate',
+    //       debugShowCheckedModeBanner: false,
+    //       initialRoute: AppRoutes.homeScreen,
+    //       routes: AppRoutes.routes,
+    //       home: BackgroundImageWidget(
+    //         imagePath: ImageConstant.imgHome,
+    //         child: HomeScreen(),
+    //       ),
+    //     );
+    //   },
+    // );
+
     return Sizer(
       builder: (context, orientation, deviceType) {
-        return MaterialApp(
-          theme: theme,
-          title: 'mealmate',
-          debugShowCheckedModeBanner: false,
-          initialRoute: AppRoutes.homeScreen,
-          routes: AppRoutes.routes,
-          home: BackgroundImageWidget(
-            imagePath: ImageConstant.imgHome,
-            child: HomeScreen(),
+        return MultiProvider(
+          providers: [
+            // Provide the AuthProvider to make it accessible from all screens
+            ChangeNotifierProvider(
+              create: (context) => AuthProvider(),
+            ),
+            // Add more providers if needed
+          ],
+          child: MaterialApp(
+            theme: theme,
+            title: 'mealmate',
+            debugShowCheckedModeBanner: false,
+            initialRoute: AppRoutes.homeScreen,
+            routes: AppRoutes.routes,
+            home: BackgroundImageWidget(
+              imagePath: ImageConstant.imgHome,
+              child: HomeScreen(),
+            ),
           ),
         );
       },
     );
+
   }
 }
 
