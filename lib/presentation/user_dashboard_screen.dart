@@ -110,6 +110,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       var responseData = json.decode(response.body);
       print(responseData);
       name = responseData['user']?['first_name'];
+      docname = responseData['my_doctor']?['first_name'];
       if (response.statusCode == 201) {
         String firstName = responseData['user']?['first_name'];
         String lastName = responseData['user']?['last_name'];
@@ -383,14 +384,18 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           mainAxisSpacing: 18.h,
         ),
         physics: BouncingScrollPhysics(),
-        itemCount: names.length, // Use the length of the lists
+        // itemCount: names.length, // Use the length of the lists
+        itemCount: 3, // Use the length of the lists
         itemBuilder: (context, index) {
           return UserprofilesectionItemWidget(
             index: index,
             id: index.toString(),
-            name: names[index], // Use the data from the lists
-            description: descriptions[index],
-            link: links[index],
+            // name: names[index], // Use the data from the lists
+            name: ("Random text"), // Use the data from the lists
+            // description: descriptions[index],
+            description: ("Random description"),
+            // link: links[index],
+            link: ("Random Text"),
           );
         },
       ),
