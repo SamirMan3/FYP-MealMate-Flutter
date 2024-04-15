@@ -56,13 +56,13 @@ class _UserprofilesectionItemWidgetState
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // CustomImageView(
-                  //   imagePath: ImageConstant.imgImage1,
-                  //   height: 123.adaptSize,
-                  //   width: 123.adaptSize,
-                  //   radius: BorderRadius.circular(20.h),
-                  // ),
-                  // SizedBox(height: 6.v),
+                  CustomImageView(
+                    imagePath: ImageConstant.imgImage1,
+                    height: 123.adaptSize,
+                    width: 123.adaptSize,
+                    radius: BorderRadius.circular(20.h),
+                  ),
+                  SizedBox(height: 6.v),
                   Text(
                     widget.name, // Use the name from the widget
                     style: theme.textTheme.bodyMedium,
