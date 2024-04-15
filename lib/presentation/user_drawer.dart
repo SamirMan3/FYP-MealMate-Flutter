@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mealmate/core/app_export.dart';
 import 'package:mealmate/main.dart';
 import '../core/utils/image_constant.dart';
@@ -7,6 +8,7 @@ import '../widgets/custom_image_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:mealmate/core/controller/authcontroller.dart';
+import 'dart:convert';
 
 class UserDrawer extends StatefulWidget {
   @override
@@ -26,17 +28,41 @@ class _UserDrawerState extends State<UserDrawer> {
     getUserData();
   }
 
-  void getUserData() {
+  void getUserData() async {
     // Fetch user data from wherever it's stored
     // For example, you can retrieve it from local storage or global state management
     // For demonstration purposes, I'll set some default values here
-    setState(() {
-      goal = 'Stay Fit';
-      ft = '5';
-      inch = '8';
-      weight = '70';
-      height = '$ft ft $inch inch';
-    });
+    final accessToken =
+        Provider.of<AuthProvider>(context, listen: false).accessToken;
+    try {
+      http.Response response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/api/getProfile'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      print("from the userdashboard for get profile");
+      var responseData = json.decode(response.body);
+      print(responseData);
+      int heightInInches = int.tryParse(responseData['user']?['height'] ?? '') ?? 0;
+      // int heightInInches = responseData['user']?['height'];
+      int feet = heightInInches ~/ 12;
+      int inches = heightInInches % 12;
+      setState(() {
+        goal = responseData['user']?['goal'];
+        ft = feet.toString();
+        inch = inches.toString();
+        weight = responseData['user']?['weight'];
+        height = '$ft ft $inch inch';
+        goalController.text = goal;
+        heightFtController.text = ft;
+        heightInchController.text = inch;
+        weightController.text = weight;
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -176,14 +202,49 @@ class _UserDrawerState extends State<UserDrawer> {
     );
   }
 
-  void _saveUserData() {
+  // void _saveUserData() {
+  //   setState(() {
+  //     goal = goalController.text.isNotEmpty ? goalController.text : goal;
+  //     ft = heightFtController.text.isNotEmpty ? heightFtController.text : ft;
+  //     inch = heightInchController.text.isNotEmpty ? heightInchController.text : inch;
+  //     weight = weightController.text.isNotEmpty ? weightController.text : weight;
+  //     height = '$ft ft $inch inch';
+  //   });
+  // }
+  void _saveUserData() async {
     setState(() {
       goal = goalController.text.isNotEmpty ? goalController.text : goal;
       ft = heightFtController.text.isNotEmpty ? heightFtController.text : ft;
-      inch = heightInchController.text.isNotEmpty ? heightInchController.text : inch;
-      weight = weightController.text.isNotEmpty ? weightController.text : weight;
+      inch = heightInchController.text.isNotEmpty
+          ? heightInchController.text
+          : inch;
+      weight =
+          weightController.text.isNotEmpty ? weightController.text : weight;
       height = '$ft ft $inch inch';
     });
+    final accessToken =
+        Provider.of<AuthProvider>(context, listen: false).accessToken;
+    http.Response response = await http.post(
+        Uri.parse('http://10.0.2.2:8000/api/user/updateProfile'),
+        headers: {
+          'Authorization':
+              'Bearer $accessToken', // Include the access token in the headers
+        },
+        body: {
+          // 'first_name': firstname,
+          // 'last_name': lastname,
+          // 'password': password,
+          // 'email': email,
+          // 'phone': phonenumber,
+          // 'gender': selectedGender,
+          // 'dob': selectedDate.toIso8601String(),
+          'feet': ft,
+          'inch': inch,
+          'weight': weight,
+          'goal': goal,
+        });
+    var responseData = json.decode(response.body);
+    print(responseData);
   }
 
   Widget _buildLogOut(BuildContext context) {
@@ -193,37 +254,40 @@ class _UserDrawerState extends State<UserDrawer> {
       margin: EdgeInsets.symmetric(horizontal: 25.h, vertical: 350.v),
       buttonStyle: CustomButtonStyles.fillPrimaryTL15,
       buttonTextStyle: CustomTextStyles.headlineSmallOnPrimaryContainer,
-      onPressed: () async{
+      onPressed: () async {
         _logoutUser(context);
       },
     );
   }
-  void _logoutUser(BuildContext context) async {
-  final accessToken = Provider.of<AuthProvider>(context, listen: false).accessToken;
-  try {
-    // Make a POST request to your server's logout endpoint
-    var response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/user/logout'),
-      headers: {
-        'Authorization': 'Bearer $accessToken', // Include the access token in the headers
-      },
-    );
 
-    // Check if the request was successful (status code 200)
-    if (response.statusCode == 200) {
-      // If successful, navigate back to the home screen
+  void _logoutUser(BuildContext context) async {
+    final accessToken =
+        Provider.of<AuthProvider>(context, listen: false).accessToken;
+    try {
+      // Make a POST request to your server's logout endpoint
+      var response = await http.post(
+        Uri.parse('http://10.0.2.2:8000/api/user/logout'),
+        headers: {
+          'Authorization':
+              'Bearer $accessToken', // Include the access token in the headers
+        },
+      );
+
+      // Check if the request was successful (status code 200)
+      if (response.statusCode == 200) {
+        // If successful, navigate back to the home screen
+        Navigator.pushNamed(context, AppRoutes.homeScreen);
+      } else {
+        // If not successful, handle the error (display a message, etc.)
+        Navigator.pushNamed(context, AppRoutes.homeScreen);
+        print("Logout failed: ${response.body}");
+        // You can display an error message to the user or handle it in any way you prefer
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the HTTP request
       Navigator.pushNamed(context, AppRoutes.homeScreen);
-    } else {
-      // If not successful, handle the error (display a message, etc.)
-      Navigator.pushNamed(context, AppRoutes.homeScreen);
-      print("Logout failed: ${response.body}");
+      print("Error logging out: $e");
       // You can display an error message to the user or handle it in any way you prefer
     }
-  } catch (e) {
-    // Handle any exceptions that occur during the HTTP request
-    Navigator.pushNamed(context, AppRoutes.homeScreen);
-    print("Error logging out: $e");
-    // You can display an error message to the user or handle it in any way you prefer
   }
-}
 }
