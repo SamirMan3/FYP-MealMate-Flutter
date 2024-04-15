@@ -20,6 +20,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 String selectedDoctor = ''; // for booking screen
 String selectedDoctorId = ''; // for booking screen
 String docname = ''; // for pre-booked screen
+final Map<String, dynamic> routine = {};
+
 
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({Key? key}) : super(key: key);
@@ -108,7 +110,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
       print("from the userdashboard for get profile");
       var responseData = json.decode(response.body);
-      print(responseData);
+      var routine = json.decode(responseData['user']['routine']);
+      print("Printing routineeeeeeeeee");
+      print(routine);
       name = responseData['user']?['first_name'];
       docname = responseData['my_doctor']?['first_name'];
       if (response.statusCode == 201) {
@@ -279,7 +283,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 onTapUserProfile: (selectedDoctorName) {
                   selectedDoctor = selectedDoctorName!;
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => UserPrescriptionScreen()));
+                      builder: (context) => UserPrescriptionScreen(routine: routine)));
                 },
                 doctorName: ('Diet plan by ' + docname),
               ),
