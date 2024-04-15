@@ -11,8 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 
-
-
 class UserDietDetailsScreen extends StatefulWidget {
   const UserDietDetailsScreen({Key? key}) : super(key: key);
 
@@ -58,13 +56,13 @@ class _UserDietDetailsScreenState extends State<UserDietDetailsScreen> {
       // Define the new data to be added
       final newData = {
         email: {
-          'monday': '',
-          'tuesday': '',
-          'wednesday': '',
-          'thursday': '',
-          'friday': '',
-          'saturday': '',
-          'sunday': '',
+          'Sunday': '',
+          'Monday':'',
+          'Tuesday': '',
+          'Wednesday': '',
+          'Thursday': '',
+          'Friday': '',
+          'Saturday': '',
         },
       };
 
