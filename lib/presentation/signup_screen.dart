@@ -136,7 +136,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     width: 305.h,
                     margin: EdgeInsets.symmetric(horizontal: 34.h),
                     child: Text(
-                      "Let’s get you your personalized health plan",
+                      "Let’s get you your personalized health plan.",
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,

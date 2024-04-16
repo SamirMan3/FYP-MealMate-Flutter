@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
                         Text(
                           "MealMate",
                           style: CustomTextStyles.headlineLargePoppins.copyWith(
-                            fontSize: 60.0,
+                            fontSize: 50.0,
                           ),
                         ),
                         SizedBox(height: 29.v),

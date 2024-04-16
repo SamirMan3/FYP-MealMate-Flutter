@@ -111,7 +111,7 @@ class _OnbordingtwoScreenState extends State<OnbordingtwoScreen> {
                 width: 312.h,
                 margin: EdgeInsets.only(left: 33.h, right: 34.h),
                 child: Text(
-                  "Select your gender so we can optimize your diet plan for you",
+                  "Select your gender so we can optimize your diet plan for you.",
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,

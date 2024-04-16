@@ -10,8 +10,8 @@ class CustomTextStyles {
   static get headlineLargePoppins => theme.textTheme.headlineLarge!.poppins;
 
   static get headlineLargeRegular => theme.textTheme.headlineLarge!.copyWith(
-        fontWeight: FontWeight.w400,
-        // fontSize: 10,
+        // fontWeight: FontWeight.w400,
+        fontSize: 24,
       );
   static get headlineSmallBlack900 => theme.textTheme.headlineSmall!.copyWith(
         color: appTheme.black900,

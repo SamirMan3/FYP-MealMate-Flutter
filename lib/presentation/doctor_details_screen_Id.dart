@@ -181,11 +181,12 @@ class _DoctorDetailsScreenIdState extends State<DoctorDetailsScreenId> {
             ratingText: "Patients", ratingValue: patients),
         _buildDoctorReviews(context,
             ratingText: "Experience", ratingValue: experience),
-        _buildDoctorReviews(context,
-            ratingText: "Rating", ratingValue: "4.5/5"),
+        // _buildDoctorReviews(context,
+        //     ratingText: "Rating", ratingValue: "4.5/5"),
       ],
     );
   }
+  
 
   Widget _buildBookNow(BuildContext context) {
     return CustomElevatedButton(

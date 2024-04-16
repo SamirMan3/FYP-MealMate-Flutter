@@ -93,12 +93,12 @@ class _OnbordingoneScreenState extends State<OnbordingoneScreen> {
                 SizedBox(height: 64.v),
                 Text("Help us know you better!",
                     style: theme.textTheme.titleLarge),
-                SizedBox(height: 44.v),
+                SizedBox(height: 30.v),
                 Container(
                   width: 335.h,
                   margin: EdgeInsets.only(left: 22.h, right: 23.h),
                   child: Text(
-                    "Select the goal you want to achieve and we'll get started right away",
+                    "Select the goal you want to achieve and we'll get started right away.",
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
@@ -120,13 +120,13 @@ class _OnbordingoneScreenState extends State<OnbordingoneScreen> {
     const double boxSpacing = 20.0;
     return Column(
       children: [
-        _buildGoalButton("Burn away my fat",
+        _buildGoalButton("Burn away my fat.",
             EdgeInsets.symmetric(horizontal: 85.h, vertical: 50.v)),
         SizedBox(height: boxSpacing),
-        _buildGoalButton("Just maintain my weight",
+        _buildGoalButton("Just maintain my weight.",
             EdgeInsets.symmetric(horizontal: 50.h, vertical: 50.v)),
         SizedBox(height: boxSpacing),
-        _buildGoalButton("Gain some huge muscles",
+        _buildGoalButton("Gain some huge muscles.",
             EdgeInsets.symmetric(horizontal: 50.h, vertical: 50.v)),
       ],
     );

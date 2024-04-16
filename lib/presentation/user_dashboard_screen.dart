@@ -22,7 +22,6 @@ String selectedDoctorId = ''; // for booking screen
 String docname = ''; // for pre-booked screen
 final Map<String, dynamic> routine = {};
 
-
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({Key? key}) : super(key: key);
 
@@ -110,16 +109,16 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
       print("from the userdashboard for get profile");
       var responseData = json.decode(response.body);
-      var routine = json.decode(responseData['user']['routine']);
+      // var routine = json.decode(responseData['user']['routine']!);
       print("Printing routineeeeeeeeee");
       print(routine);
       name = responseData['user']?['first_name'];
-      docname = responseData['my_doctor']?['first_name'];
+      docname = responseData['my_doctor']?['first_name'] ?? '';
       if (response.statusCode == 201) {
-        String firstName = responseData['user']?['first_name'];
-        String lastName = responseData['user']?['last_name'];
-        String docFirstName = responseData['my_doctor']?['first_name'];
-        String docLastName = responseData['my_doctor']?['last_name'];
+        String firstName = responseData['user']?['first_name'] ?? '';
+        String lastName = responseData['user']?['last_name'] ?? '';
+        String docFirstName = responseData['my_doctor']?['first_name'] ?? '';
+        String docLastName = responseData['my_doctor']?['last_name'] ?? '';
 
 // Concatenate first and last name
         String fullName = '$firstName $lastName';
@@ -127,12 +126,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
         docname = docFirstName;
         print(name);
-        // name = username.data()['username'];
-        // docname = username.data()['doctor name'];
-        // goal = username.data()['goal'];
       }
-      // doctors = responseData['doctor_list'];
-      // final newUser= data;
     } catch (e) {
       print('hello from the catch');
       print(e);
@@ -283,7 +277,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 onTapUserProfile: (selectedDoctorName) {
                   selectedDoctor = selectedDoctorName!;
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => UserPrescriptionScreen(routine: routine)));
+                      builder: (context) =>
+                          UserPrescriptionScreen(routine: routine)));
                 },
                 doctorName: ('Diet plan by ' + docname),
               ),
@@ -434,8 +429,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      DoctorDetailsScreenId(doctorId: selectedDoctorId.toString()),
+                  builder: (context) => DoctorDetailsScreenId(
+                      doctorId: selectedDoctorId.toString()),
                 ),
               );
               //  arguments: '3'

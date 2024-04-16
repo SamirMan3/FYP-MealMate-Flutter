@@ -24,157 +24,105 @@ class UserPrescriptionScreen extends StatefulWidget {
 }
 
 class _UserPrescriptionScreenState extends State<UserPrescriptionScreen> {
-  final _firestore = FirebaseFirestore.instance;
-  String monday = '',
-      tuesday = '',
-      wednesday = '',
-      thursday = '',
-      friday = '',
-      saturday = '',
-      sunday = '',
-      remarks = '';
-  Map<String, dynamic> patients = {};
+  String monday = '', tuesday = '', wednesday = '', thursday = '', friday = '', saturday = '', sunday = '', remarks = '';
 
   @override
   void initState() {
     super.initState();
-    print(routine);
     getProfile();
   }
 
   getProfile() async {
-    final accessToken =
-        Provider.of<AuthProvider>(context, listen: false).accessToken;
     try {
       http.Response response = await http.get(
         Uri.parse('http://10.0.2.2:8000/api/getProfile'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer ${Provider.of<AuthProvider>(context, listen: false).accessToken}'},
       );
 
-      print("from the userdashboard for get profile");
       var responseData = json.decode(response.body);
       var routine = json.decode(responseData['user']['routine']);
-      print("Printing routineeeeeeeeee");
-      print(routine);
-      sunday = routine['sunday'] ?? '';
-      monday = routine['monday'] ?? '';
-      tuesday = routine['tuesday'] ?? '';
-      wednesday = routine['wednesday'] ?? '';
-      thursday = routine['thursday'] ?? '';
-      friday = routine['friday'] ?? '';
-      saturday = routine['saturday'] ?? '';
-      remarks = routine['remarks'] ?? '';
 
-    print(saturday);
-      // doctors = responseData['doctor_list'];
-      // final newUser= data;
+      setState(() {
+        sunday = routine['sunday'] ?? '';
+        monday = routine['monday'] ?? '';
+        tuesday = routine['tuesday'] ?? '';
+        wednesday = routine['wednesday'] ?? '';
+        thursday = routine['thursday'] ?? '';
+        friday = routine['friday'] ?? '';
+        saturday = routine['saturday'] ?? '';
+        remarks = routine['remarks'] ?? '';
+      });
     } catch (e) {
-      print('hello from the catch');
-      print(e);
+      print('Error: $e');
     }
-    setState(() {
-      _buildBody(context);
-    });
-  }
-
-  void getPatientDetails() async {
-    final docDetails = await _firestore
-        .collection('doctors')
-        .where('doctor name', isEqualTo: docname)
-        .get();
-    for (var details in docDetails.docs) {
-      patients = details.data()['Diet plan for patients'];
-      // print(patients);
-      // Check if the specified 'email' loggedin with exists in the patients map
-      if (patients.containsKey(email)) {
-        final patientData = patients[email] as Map<String, dynamic>;
-        sunday = patientData['sunday'] ?? '';
-        monday = patientData['monday'] ?? '';
-        tuesday = patientData['tuesday'] ?? '';
-        wednesday = patientData['wednesday'] ?? '';
-        thursday = patientData['thursday'] ?? '';
-        friday = patientData['friday'] ?? '';
-        saturday = patientData['saturday'] ?? '';
-      }
-    }
-    setState(() {
-      _buildBody(context);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(child: _buildBody(context)),
-        bottomNavigationBar: _buildBackToHome(context),
+        appBar: AppBar(title: Text('Prescription Details')),
+        body: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDayTile(Icons.calendar_today, 'Sunday', sunday),
+                _buildDayTile(Icons.calendar_today, 'Monday', monday),
+                _buildDayTile(Icons.calendar_today, 'Tuesday', tuesday),
+                _buildDayTile(Icons.calendar_today, 'Wednesday', wednesday),
+                _buildDayTile(Icons.calendar_today, 'Thursday', thursday),
+                _buildDayTile(Icons.calendar_today, 'Friday', friday),
+                _buildDayTile(Icons.calendar_today, 'Saturday', saturday),
+                SizedBox(height: 20.0),
+                _buildDayTile(Icons.notes, 'Remarks', remarks),
+              ],
+            ),
+          ),
+        ),
+        bottomNavigationBar: _buildBackToHomeButton(),
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildDayTile(IconData icon, String day, String detail) {
+    return Card(
+      elevation: 3.0,
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(
+          day,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+        ),
+        subtitle: Text(
+          detail,
+          style: TextStyle(fontSize: 14.0),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackToHomeButton() {
     return Container(
-      width: double.maxFinite,
-      padding: EdgeInsets.symmetric(horizontal: 9.h, vertical: 30.v),
-      child: Column(
-        children: [
-          SizedBox(height: 20.v),
-          Text("Prescription Details", style: theme.textTheme.displaySmall),
-          SizedBox(height: 20.v),
-          Text('by ' + docname, style: theme.textTheme.titleLarge),
-          _buildDayWidget(sunday, "Sunday"),
-          _buildDayWidget(monday, "Monday"),
-          _buildDayWidget(tuesday, "Tuesday"),
-          _buildDayWidget(wednesday, "Wednesday"),
-          _buildDayWidget(thursday, "Thursday"),
-          _buildDayWidget(friday, "Friday"),
-          _buildDayWidget(saturday, "Saturday"),
-          _buildDayWidget(remarks, "Remarks"),
-        ],
+      padding: EdgeInsets.all(16.0),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.pushNamed(context, AppRoutes.userDashboardScreen);
+        },
+        style: ElevatedButton.styleFrom(
+          primary: Colors.blue,
+          padding: EdgeInsets.symmetric(vertical: 20.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+        child: Text(
+          'Back To Home',
+          style: TextStyle(fontSize: 20.0, color: Colors.white),
+        ),
       ),
     );
-  }
-
-  Widget _buildDayWidget(String day, String dayText) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 30.v),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.only(left: 18.h),
-            child: Text(dayText, style: theme.textTheme.titleLarge),
-          ),
-        ),
-        SizedBox(height: 10.v),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.only(left: 20.h),
-            child: Text(day, style: CustomTextStyles.titleLargeBlack90003),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBackToHome(BuildContext context) {
-    return CustomElevatedButton(
-      height: 51.v,
-      text: "Back To Home",
-      margin: EdgeInsets.only(left: 15.h, right: 15.h, bottom: 32.v),
-      buttonStyle: CustomButtonStyles.fillPrimaryTL15,
-      buttonTextStyle: CustomTextStyles.headlineSmallOnPrimaryContainer,
-      onPressed: () {
-        onTapBookNow(context);
-      },
-    );
-  }
-
-  onTapBookNow(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.userDashboardScreen);
   }
 }

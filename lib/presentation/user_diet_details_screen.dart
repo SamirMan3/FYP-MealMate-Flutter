@@ -113,7 +113,7 @@ void   generateDietPlan(history, allergens, doctorId)async{
             padding: EdgeInsets.only(left: 15.h, top: 50.v, right: 15.h),
             child: Column(
               children: [
-                Text("Enter Details", style: theme.textTheme.displaySmall),
+                Text("Enter additional Details", style: theme.textTheme.displaySmall),
                 SizedBox(height: 40.v),
                 CustomTextFormField(
                   onChanged: (value) {
@@ -158,7 +158,7 @@ void   generateDietPlan(history, allergens, doctorId)async{
 
     return CustomElevatedButton(
       height: 51.v,
-      text: "Generate Diet plan",
+      text: "Request Diet plan",
       margin: EdgeInsets.only(left: 15.h, right: 15.h, bottom: 32.v),
       buttonStyle: CustomButtonStyles.fillPrimaryTL15,
       buttonTextStyle: CustomTextStyles.headlineSmallOnPrimaryContainer,

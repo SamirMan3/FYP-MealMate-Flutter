@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +19,7 @@ class UserSigninScreen extends StatefulWidget {
 }
 
 class _UserSigninScreenState extends State<UserSigninScreen> {
+  final _formKey = GlobalKey<FormState>(); 
   String password = '', loggedinEmail = '';
   bool obsecurePass = true, notReg = false;
   // final _auth = FirebaseAuth.instance;
@@ -27,7 +27,7 @@ class _UserSigninScreenState extends State<UserSigninScreen> {
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final Loading = false;
 
   bool passwordError = false; // Track password error
@@ -121,6 +121,7 @@ class _UserSigninScreenState extends State<UserSigninScreen> {
                           obsecurePass = !obsecurePass;
                         });
                       },
+                      
                       icon: obsecurePass
                           ? const Icon(
                               Icons.visibility_off_outlined,
@@ -139,7 +140,7 @@ class _UserSigninScreenState extends State<UserSigninScreen> {
                 ),
                 SizedBox(height: 40.v),
                 CustomElevatedButton(
-                  text: "Sign In",
+                  text: "Log In",
                   buttonTextStyle: CustomTextStyles.headlineSmallBlack90004,
                   onPressed: () async {
                     // onTapSignUp(context);
