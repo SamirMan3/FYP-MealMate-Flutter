@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:mealmate/core/controller/authcontroller.dart';
 import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class UserDrawer extends StatefulWidget {
   @override
@@ -16,11 +18,21 @@ class UserDrawer extends StatefulWidget {
 }
 
 class _UserDrawerState extends State<UserDrawer> {
-  String goal = '', height = '', weight = '', ft = '', inch = '';
+  String goal = '',
+      height = '',
+      weight = '',
+      ft = '',
+      inch = '',
+      first_name = '',
+      last_name = '',
+      dob = '';
   TextEditingController goalController = TextEditingController();
   TextEditingController heightFtController = TextEditingController();
   TextEditingController heightInchController = TextEditingController();
   TextEditingController weightController = TextEditingController();
+  TextEditingController first_nameController = TextEditingController();
+  TextEditingController last_nameController = TextEditingController();
+  TextEditingController _dobController = TextEditingController();
 
   @override
   void initState() {
@@ -45,22 +57,33 @@ class _UserDrawerState extends State<UserDrawer> {
       print("from the userdashboard for get profile");
       var responseData = json.decode(response.body);
       print(responseData);
-      int heightInInches = int.tryParse(responseData['user']?['height'] ?? '') ?? 0;
+      int heightInInches =
+          int.tryParse(responseData['user']?['height'] ?? '') ?? 0;
       // int heightInInches = responseData['user']?['height'];
       int feet = heightInInches ~/ 12;
       int inches = heightInInches % 12;
+      print(feet);
+      print(inches);
       setState(() {
+        first_name = responseData['user']?['first_name'];
+        last_name = responseData['user']?['last_name'];
         goal = responseData['user']?['goal'];
+        dob = responseData['user']?['date_of_birth'];
         ft = feet.toString();
         inch = inches.toString();
-        weight = responseData['user']?['weight'];
         height = '$ft ft $inch inch';
+        weight = responseData['user']?['weight'];
+
+        first_nameController.text = responseData['user']?['first_name'];
+        last_nameController.text = responseData['user']?['last_name'];
         goalController.text = goal;
+        _dobController.text = responseData['user']?['date_of_birth'];
         heightFtController.text = ft;
         heightInchController.text = inch;
         weightController.text = weight;
       });
     } catch (e) {
+      print("Hello from catch user drawerrrrr");
       print(e);
     }
   }
@@ -100,7 +123,10 @@ class _UserDrawerState extends State<UserDrawer> {
               ],
             ),
           ),
+          _buildListTile('First Name', first_name),
+          _buildListTile('Last Name', last_name),
           _buildListTile('Goal', goal),
+          _buildListTile('Date of Birth', dob),
           _buildListTile('Height', height),
           _buildListTile('Weight', weight),
           SizedBox(height: 20.v),
@@ -150,8 +176,23 @@ class _UserDrawerState extends State<UserDrawer> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
+                  controller: first_nameController,
+                  decoration: InputDecoration(labelText: 'First Name'),
+                ),
+                TextFormField(
+                  controller: last_nameController,
+                  decoration: InputDecoration(labelText: 'Last Name'),
+                ),
+                TextFormField(
                   controller: goalController,
                   decoration: InputDecoration(labelText: 'Goal'),
+                ),
+                TextFormField(
+                  controller: _dobController,
+                  decoration: InputDecoration(labelText: 'Date of birth'),
+                  onTap: () {
+                    _selectDate(context);
+                  },
                 ),
                 SizedBox(height: 10.v),
                 Row(
@@ -169,6 +210,12 @@ class _UserDrawerState extends State<UserDrawer> {
                         controller: heightInchController,
                         decoration: InputDecoration(labelText: 'Height (inch)'),
                         keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^[1-9]|1[0-1]?$')),
+                          LengthLimitingTextInputFormatter(
+                              2), // Allows numbers between 1 and 11
+                        ],
                       ),
                     ),
                   ],
@@ -213,7 +260,14 @@ class _UserDrawerState extends State<UserDrawer> {
   // }
   void _saveUserData() async {
     setState(() {
+      first_name = first_nameController.text.isNotEmpty
+          ? first_nameController.text
+          : first_name;
+      last_name = last_nameController.text.isNotEmpty
+          ? last_nameController.text
+          : last_name;
       goal = goalController.text.isNotEmpty ? goalController.text : goal;
+      dob = _dobController.text.isNotEmpty ? _dobController.text : dob;
       ft = heightFtController.text.isNotEmpty ? heightFtController.text : ft;
       inch = heightInchController.text.isNotEmpty
           ? heightInchController.text
@@ -242,6 +296,9 @@ class _UserDrawerState extends State<UserDrawer> {
           'inch': inch,
           'weight': weight,
           'goal': goal,
+          'first name': first_name,
+          'last name': last_name,
+          'dob': dob
         });
     var responseData = json.decode(response.body);
     print(responseData);
@@ -249,9 +306,9 @@ class _UserDrawerState extends State<UserDrawer> {
 
   Widget _buildLogOut(BuildContext context) {
     return CustomElevatedButton(
-      height: 51.v,
+      height: 50.v,
       text: "Log Out",
-      margin: EdgeInsets.symmetric(horizontal: 25.h, vertical: 350.v),
+      margin: EdgeInsets.symmetric(horizontal: 25.h, vertical: 240.v),
       buttonStyle: CustomButtonStyles.fillPrimaryTL15,
       buttonTextStyle: CustomTextStyles.headlineSmallOnPrimaryContainer,
       onPressed: () async {
@@ -289,5 +346,26 @@ class _UserDrawerState extends State<UserDrawer> {
       print("Error logging out: $e");
       // You can display an error message to the user or handle it in any way you prefer
     }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime initialDate1 = dob != null ? DateTime.parse(dob) : DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate1 ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != initialDate1)
+      setState(() {
+        initialDate1 = picked;
+        String formattedDate =
+            DateFormat('yyyy-MM-dd').format(picked); // Format the picked date
+        _dobController.text =
+            formattedDate; // Set the formatted date to the text field
+        dob = formattedDate; // Store the formatted date in the dob variable
+        print('################################################');
+        print(picked);
+      });
   }
 }
